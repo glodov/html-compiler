@@ -1,0 +1,17 @@
+{
+	"facebook": {
+		"url": "https://facebook.com",
+		"title": "Follow us on Facebook",
+		"icon": "fa-facebook"
+	},
+	"instagram": {
+		"url": "https://instagram.com",
+		"title": "Follow us on Instagram",
+		"icon": "fa-instagram"
+	},
+	"youtube": {
+		"url": "https://youtube.com",
+		"title": "Watch us on Youtube",
+		"icon": "fa-youtube"
+	}
+}

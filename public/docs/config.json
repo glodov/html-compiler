@@ -1,0 +1,5 @@
+{
+	"env": {
+		"mode": "Environment mode = live | dev, by default live"
+	}
+}

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Host: %HOST%
+Sitemap: %HOST%/sitemap.xml

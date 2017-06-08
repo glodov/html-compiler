@@ -1,0 +1,12 @@
+{
+	"en": {
+		"name": "en",
+		"title": "English",
+		"url": "/"
+	},
+	"es": {
+		"name": "es",
+		"title": "Español",
+		"url": "/es"
+	}
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="<?= $locale ?>">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title><?= htmlspecialchars($page->title) ?></title>
+
+	<?php foreach ($app->getStyles() as $item) : ?>
+	<?php if ($item->inline) : ?>
+
+	<style type="text/css">
+		<?php include($devDir . $item->src)  ?>
+	</style>
+
+	<?php elseif ($item->attributes) : ?>
+
+	<link
+		<?php foreach ($item->attributes as $name => $value) : ?>
+		<?= $name ?>="<?= htmlspecialchars($value) ?>"
+		<?php endforeach; ?>
+	>
+
+	<?php else : ?>
+
+	<link href="<?= $item->src ?>" rel="stylesheet">
+
+	<?php endif; ?>
+	<?php endforeach; ?>
+
+	
+	<?php if (isset($config->ide->phpstorm)) : ?>
+
+	<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+
+	<?php endif; ?>
+	
+</head>
+<body>

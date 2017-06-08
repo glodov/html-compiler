@@ -1,0 +1,29 @@
+.jumbotron {
+	margin-bottom: 0;
+	border-radius: 0;
+}
+
+.board-icon {
+	min-width: 150px;
+	min-height: 150px;
+	max-width: 200px;
+	max-height: 200px;
+}
+.board-icon-sm {
+	min-width: 150px;
+	min-height: 150px;
+	max-width: 150px;
+	max-height: 150px;
+}
+.board-lg-col {
+	flex-grow: 100;
+}
+.board-sm-col {
+	flex-grow: 1;
+	min-width: 200px;
+	max-width: 200px;
+
+	@include media-breakpoint-down(sm) {
+		min-width: 100%;
+	}
+}

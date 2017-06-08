@@ -1,0 +1,56 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "2f5db0e4d3b3cda17dd35ff8f5dab121",
+    "content-hash": "d5bba0053436a2e3f7af3042616f5757",
+    "packages": [
+        {
+            "name": "emanueleminotto/simple-html-dom",
+            "version": "1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/EmanueleMinotto/simple-html-dom.git",
+                "reference": "09b7f3ad5b62d1cc3dfc2d326845e73d2cdc2819"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/EmanueleMinotto/simple-html-dom/zipball/09b7f3ad5b62d1cc3dfc2d326845e73d2cdc2819",
+                "reference": "09b7f3ad5b62d1cc3dfc2d326845e73d2cdc2819",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "simple_html_dom.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "S.C. Chen",
+                    "email": "me578022@gmail.com"
+                },
+                {
+                    "name": "Emanuele Minotto",
+                    "email": "minottoemanuele@gmail.com"
+                }
+            ],
+            "description": "PHP Simple HTML DOM Parser",
+            "time": "2015-08-31 00:31:29"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

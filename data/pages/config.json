@@ -1,0 +1,20 @@
+{
+	"url": {
+		"prompt": "Enter url: ",
+		"required": true,
+		"unique": true
+	},
+	"name": {
+		"prompt": "Enter name: ",
+		"required": true,
+		"primary": true
+	},
+	"menu": {
+		"prompt": "Menu ({locale.title}): ",
+		"locales": true
+	},
+	"title": {
+		"prompt": "Title ({locale.title}): ",
+		"locales": true
+	}
+}

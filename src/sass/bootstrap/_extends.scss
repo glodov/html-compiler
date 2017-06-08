@@ -1,0 +1,124 @@
+input, select, .btn {
+	font-family: $font-family-base;
+}
+
+.p-relative {
+  position: relative;
+}
+.p-absolute {
+  position: absolute;
+}
+.p-fixed {
+  position: fixed;
+}
+.p-static {
+  position: static;
+}
+
+.bg-transparent {
+  background-color: transparent;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+.mb-auto {
+  margin-bottom: auto;
+}
+.m-auto {
+  margin: auto;
+}
+
+.btn-lg {
+	border-width: 2px;
+}
+
+.btn-round {
+	border-radius: 5rem;
+}
+.btn-round-sm {
+	border-radius: 0.75rem;
+}
+
+$brands: (
+  'primary': $brand-primary,
+  'warning': $brand-warning,
+  'danger':  $brand-danger,
+  'info':    $brand-info,
+  'success': $brand-success,
+  'white':   $white
+);
+$opacities: (
+  10: 0.1,
+  20: 0.2,
+  30: 0.3,
+  40: 0.4,
+  50: 0.5,
+  60: 0.6,
+  70: 0.7,
+  80: 0.8,
+  90: 0.9
+);
+
+@each $number, $opacity in $opacities {
+  @each $brand, $color in $brands {
+    .bg-#{$brand}-#{$number} {
+      background-color: rgba($color, $opacity);
+    }
+  }
+
+  .opacity-#{$number} {
+    opacity: $opacity;
+  }
+}
+
+.substrate {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+// @each $breakpoint in map-keys($grid-breakpoints) {
+// 	@include media-breakpoint-up($breakpoint) {
+// 		$infix: breakpoint-infix-up($breakpoint, $grid-breakpoints);
+
+// 		.btn#{$infix}-block {
+// 			display: block;
+// 			width: 100%;
+// 		}
+// 	}
+// }
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-down($breakpoint) {
+  	$next: breakpoint-next($breakpoint);
+    $infix: breakpoint-infix($next, $grid-breakpoints);
+
+    // .btn-#{$breakpoint}-block {
+    // 	display: block;
+    // 	width: 100%;
+    // }
+
+    .btn#{$infix}-block {
+      display: block;
+      width: 100%;
+
+      @each $breakpoint2 in map-keys($grid-breakpoints) {
+      	$next2: breakpoint-next($breakpoint2);
+        $infix2: breakpoint-infix($next2, $grid-breakpoints);
+
+        + .btn#{$infix2}-block {
+          margin-top: $btn-block-spacing-y;
+        }
+
+        .btn#{$infix2}-block + & {
+          margin-top: $btn-block-spacing-y;
+        }
+      }
+    }
+  }
+}
+
+

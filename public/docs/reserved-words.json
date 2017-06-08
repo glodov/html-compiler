@@ -1,0 +1,17 @@
+{
+	"constants": {
+		"DEV_MODE": "true if runs in dev mode, used to attach local modules instead of CDN to let develop project offline",
+		"LIVE_MODE": "true if runs live mode, used by compiler usually"
+	},
+	"variables": {
+		"config": "Project configuration loaded from /config/*.ini",
+		"locale": "Current locale",
+		"locales": "Available locales with url in every locale for current page",
+		"uri": "Current REQUEST_URI without locale",
+		"page": "Current page model",
+		"pages": "Available pages models",		
+
+		"cookieLocale": "Selected local by user stored in cookies",
+		"defaultLocale": "Default project locale"
+	}
+}

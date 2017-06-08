@@ -1,0 +1,6 @@
+[env]
+mode = live     ; required
+mode = dev
+
+[ide]
+phpstorm = true

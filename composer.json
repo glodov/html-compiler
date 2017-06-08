@@ -1,0 +1,13 @@
+{
+    "require": {
+        "emanueleminotto/simple-html-dom": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+        	"HtmlCompiler\\": "src/HtmlCompiler/"
+        }
+    },
+    "description": "HTML Compiler / Builder",
+    "license": "MIT",
+    "name": "glodov/html-compiler"
+}

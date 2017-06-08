@@ -1,0 +1,26 @@
+
+	<?php foreach ($app->getScripts() as $item) : ?>
+	<?php if ($item->inline) : ?>
+
+	<script type="text/javascript">
+		<?php include($devDir . $item->src)  ?>
+	</script>
+
+	<?php elseif ($item->attributes) : ?>
+
+	<script
+		<?php foreach ($item->attributes as $name => $value) : ?>
+		<?= $name ?>="<?= htmlspecialchars($value) ?>"
+		<?php endforeach; ?>
+	>
+	</script>
+
+	<?php else : ?>
+
+	<script href="<?= $item->src ?>" type="text/javascript"></script>
+
+	<?php endif; ?>
+	<?php endforeach; ?>
+	
+</body>
+</html>

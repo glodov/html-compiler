@@ -1,0 +1,36 @@
+$navbar-large-height: 96px;
+$navbar-small-height: 57px;
+
+@include media-breakpoint-down(lg) {
+	body {
+		padding-top: $navbar-small-height;
+	}
+}
+@include media-breakpoint-up(lg) {
+	body {
+		padding-top: $navbar-large-height;
+	}
+}
+
+.navbar {
+	li {
+		text-transform: uppercase;
+	}
+
+	.nav-item.active {
+		text-decoration: underline;
+	}
+}
+.navbar-brand {
+	img {
+		width: 200px;
+		height: 32px;
+	}
+}
+.navbar-toggler {
+	border: none;
+}
+
+.navbar-toggler-right {
+	right: 0;
+}

@@ -1,0 +1,46 @@
+{
+	"scripts": {
+		"jquery": {
+			"dev": "~jquery",
+			"live": {
+				"src": "https://code.jquery.com/jquery-3.2.1.min.js",
+				"integrity": "sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=",
+				"crossorigin": "anonymous"
+			}
+		},
+
+		"tether": {
+			"dev": "~tether",
+			"live": {
+				"src": "https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js",
+				"integrity": "sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb",
+				"crossorigin": "anonymous"
+			}
+		},
+
+		"bootstrap": {
+			"dev": "~bootstrap",
+			"live": {
+				"src": "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js",
+				"integrity": "sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn",
+				"crossorigin": "anonymous"
+			}
+		},
+
+		"bundle": "/assets/bundle.js"
+	},
+	"styles": {
+		"font-awesome": {
+			"dev": "~font-awesome",
+			"live": "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+		},
+
+		"font-pt-sans": {
+			"dev": "~typeface-pt-sans",
+			"live": "https://fonts.googleapis.com/css?family=PT+Sans:400,700"
+		},
+
+		"inline": "/assets/css/inline.css",
+		"bundle": "/assets/css/bundle.css"
+	}
+}
