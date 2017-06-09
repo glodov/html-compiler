@@ -74,6 +74,9 @@ class CliController
 		if (!is_scalar($data)) {
 			$data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 		}
+		if (!file_exists(dirname($file))) {
+			mkdir(dirname($file), 0777, true);
+		}
 		file_put_contents($file, $data);
 	}
 
