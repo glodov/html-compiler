@@ -1,6 +1,8 @@
 <?php
 
-include_once(__DIR__ . '/../includes/application.class.php');
+include_once(__DIR__ . '/../vendor/autoload.php');
+
+use HtmlCompiler\Application;
 
 class CliController
 {
@@ -67,21 +69,84 @@ class CliController
 		return $name;		
 	}
 
-	private function save($data, $filename, $locale = null, $dir = 'data')
+	private function save($data, $file)
 	{
-		$file = __DIR__ . '/../' . $dir . '/' 
-			. ($locale ? $locale . '/' : '') . $filename;
 		if (!is_scalar($data)) {
 			$data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 		}
 		file_put_contents($file, $data);
 	}
 
-	private function drop($filename, $locale = null, $dir = 'data')
+	private function getPageFile($name, $locale = null)
 	{
-		$file = __DIR__ . '/../' . $dir . '/' 
-			. ($locale ? $locale . '/' : '') . $filename;
-		unlink($file);
+		$file = $this->app->dataDir . '/pages/';
+		if ($locale) {
+			$file .= $locale . '/' . $name . '.json';
+		} else {
+			$file .= 'db.json';
+		}
+		return $file;
+	}
+
+	private function getTplFile($name = null, $locale = null)
+	{
+		if ($name === null && $locale === null) {
+			return $this->app->appDir . '/tpl/examples/template.html';
+		}
+		return $this->app->appDir . '/tpl/pages/' . $locale . '/' . $name . '.html';
+	}
+
+	public function savePage($page)
+	{
+		$template = file_get_contents($this->getTplFile());
+
+		foreach ($page->__locales as $locale => $value) {
+			// save in data/pages/[locale]/[page->name].json
+			$name = $page->__primary;
+			$file = $this->getPageFile($page->$name, $locale);
+			$this->save((object) $value, $file);
+
+			// save in tpl/pages/[locale]/[page->name].html
+			$str = [];
+			foreach ($value as $k => $v) {
+				$str["%$k%"] = $v;
+			}
+			$html = strtr($template, $str);
+			$file = $this->getTplFile($page->$name, $locale);
+			$this->save($html, $file);
+		}
+
+		$name = $page->__primary;
+		// $page->$name
+
+		foreach ($page as $k => $v) {
+			if (substr($k, 0, 2) == '__') {
+				unset($page->$k);
+			}
+		}
+
+		$pages = $this->app->getPages();
+		$pages[$page->$name] = $page;
+		$file = $this->getPageFile($page->$name);
+		$this->save($pages, $file);
+	}
+
+	public function dropPage($page)
+	{
+		// save in pages.json
+		$pages   = $this->app->getPages();
+		unset($pages[$page->name]);
+		$file = $this->getPageFile($page->name);
+		$this->save($pages, $file);
+
+		// delete pages [locale]/[page].json & [locale]/[page].tpl
+		foreach ($this->app->getLocales() as $locale => $title) {
+			$file = $this->getPageFile($page->name, $locale);
+			unlink($file);
+
+			$file = $this->getTplFile($page->name, $locale);
+			unlink($file);
+		}		
 	}
 
 	public function addPageAction()
@@ -91,61 +156,94 @@ class CliController
 		// add item in navigation
 		print("Adding a page\n");
 
-		$url = readline('Enter url: ');
-		$url = $url ? $url : '/';
+		$toRead = [];
 
-		$default = $this->decodeName($url);
+		$locales = $this->app->getLocales();
 
-		$name = readline('Enter name [' . $default . ']: ');
-		$name = $this->decodeName($name, $default);
+		$config = $this->app->getPagesConfig();
+		foreach ($config as $fieldName => $field) {
+			$required = isset($field->required) && $field->required;
+			$primary  = isset($field->primary) && $field->primary;
+			if (isset($field->locales) && $field->locales) {
+				foreach ($locales as $locale => $item) {
+					$to = clone $field;
+					$str = [];
+					foreach ($item as $k => $v) {
+						$str['{locale.' . $k .'}'] = $v;
+					}
+					$to->prompt     = strtr($field->prompt, $str);
+					$to->__name     = $locale . '.' . $fieldName;
+					$to->__primary  = false;
+					$to->__required = isset($field->required) && $field->required;
+					$to->__unique   = false;
+					$toRead[] = $to;
+				}
+			} else {
+				$to = clone $field;
+				$to->__name     = $fieldName;
+				$to->__primary  = isset($field->primary) && $field->primary;
+				$to->__required = isset($field->required) && $field->required;
+				$to->__unique   = isset($field->unique) && $field->unique;
+				$toRead[] = $to;
+			}
+		}
 
 		$page = (object) [
-			'url'  => $url,
-			'name' => $name,
-			'menu' => true
+			'__primary' => null,
+			'__locales' => [],
+			'__unique'  => []
 		];
 
-		if ($this->doesPageExist($page)) {
-			printf("Page [%s: %s] already exists\n", $name, $url);
+		$pages = $this->app->getPages();
+
+		foreach ($toRead as $what) {
+			if ($what->__primary) {
+				$page->__primary  = $what->__name;
+				$page->__unique[] = $what->__name;
+			}
+			if ($what->__unique) {
+				$page->__unique[] = $what->__name;
+			}
+		}
+
+		if (!$page->__primary) {
+			print("Primary field is undefined\n");
 			exit;
 		}
 
-		$menu = readline('Is page in menu? [Y/n]: ');
-		$page->menu = in_array($menu, ['', 'Y', 'y']);
-
-		$titles = [];
-		foreach ($this->app->getLocales() as $locale => $item) {
-			$titles[$locale] = (object) ['menu' => '', 'title' => ''];
-			$titles[$locale]->title = readline('Enter title (' . $item->title . '): ');
-
-			if (!$page->menu) {
-				continue;
-			}
-			$titles[$locale]->menu = readline('Enter menu (' . $item->title . '): ');
-			if (!$titles[$locale]->menu) {
-				$titles[$locale]->menu = $titles[$locale]->title;
+		foreach ($toRead as $what) {
+			do
+			{
+				$correct = true;
+				$value = trim(readline($what->prompt));
+				if ($required && '' == $value) {
+					print("  > Required field\n");
+					$correct = false;
+				}
+				if ($what->__unique) {
+					$name = $what->__name;
+					foreach ($pages as $item) {
+						if (isset($item->$name) && $item->$name == $value) {
+							print("  > Value is not unique\n");
+							$correct = false;
+							break;
+						}
+					}
+				}
+			} while (!$correct);
+			$arr = explode('.', $what->__name);
+			if (count($arr) > 1) {
+				if (!isset($page->__locales[$arr[0]])) {
+					$page->__locales[$arr[0]] = [];
+				}
+				$page->__locales[$arr[0]][$arr[1]] = $value;
+			} else {
+				$name = $arr[0];
+				$page->$name = $value;
 			}
 		}
 
-		// save in pages.json
-		$pages   = $this->app->getPages();
-		$pages[$page->name] = $page;
-		$this->save($pages, 'pages.json');
-
-		$template = file_get_contents(__DIR__ . '/../tpl/examples/template.html');
-
-		foreach ($titles as $locale => $title) {
-			// save in data/[locale]/[page->name].json
-			$item = [
-				'menu'  => $title->menu,
-				'title' => $title->title
-			];
-			$this->save($item, $page->name . '.json', $locale);
-
-			// save in tpl/pages/[locale]/[page->name].html
-			$html = str_replace('%title%', $title->title, $template);
-			$this->save($html, $page->name . '.html', $locale, 'tpl/pages');
-		}
+		$this->savePage($page);
 
 		printf("Page %s successfully added\n", $page->name);
 	}
@@ -171,18 +269,7 @@ class CliController
 
 		$page = $pages[(int) $id - 1];
 
-		// save in pages.json
-		$pages   = $this->app->getPages();
-		unset($pages[$page->name]);
-		$this->save($pages, 'pages.json');
-
-		foreach ($this->app->getLocales() as $locale => $title) {
-			// save in data/[locale]/[page->name].json
-			$this->drop($page->name . '.json', $locale);
-
-			// save in tpl/pages/[locale]/[page->name].html
-			$this->drop($page->name . '.html', $locale, 'tpl/pages');
-		}
+		$this->dropPage($page);
 
 		printf("Page %s successfully removed\n", $page->name);
 	}

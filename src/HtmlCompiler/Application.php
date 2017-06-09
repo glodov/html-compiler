@@ -31,6 +31,7 @@ class Application
 	public $appDir;
 	public $pubDir;
 	public $devDir;
+	public $dataDir;
 
 	public function __construct($appDir = null)
 	{
@@ -41,8 +42,9 @@ class Application
 		// load config
 		$this->config();
 
-		$this->devDir = $this->appDir . '/public/dev';
-		$this->pubDir = $this->appDir . '/public/' . (LIVE_MODE ? 'live': 'dev');
+		$this->devDir  = $this->appDir . '/public/dev';
+		$this->pubDir  = $this->appDir . '/public/' . (LIVE_MODE ? 'live': 'dev');
+		$this->dataDir = $this->appDir . '/data';
 	}
 
 	public function run($uri = '/', $locale = null)
@@ -153,6 +155,11 @@ class Application
 			}
 		}
 		return $this->pages;
+	}
+
+	public function getPagesConfig()
+	{
+		return $this->readJson('data/pages/config.json');
 	}
 
 	public function getTplFile()
