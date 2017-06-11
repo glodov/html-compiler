@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js && compass compile",
     "build:min": "NODE_ENV=production npm run build && compass compile",
-    "compile": "yarn run build:min && php cli/update.php && php cli/compile.php"
+    "styles": "compass compile",
+    "compile": "yarn run build:min && php cli/compile.php"
   },
   "repository": {
     "type": "git",

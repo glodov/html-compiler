@@ -45,6 +45,7 @@ class Application
 		$this->devDir  = $this->appDir . '/public/dev';
 		$this->pubDir  = $this->appDir . '/public/' . (LIVE_MODE ? 'live': 'dev');
 		$this->dataDir = $this->appDir . '/data';
+
 	}
 
 	public function run($uri = '/', $locale = null)
@@ -162,9 +163,21 @@ class Application
 		return $this->readJson('data/pages/config.json');
 	}
 
+	public function getRender()
+	{
+		if (isset($this->config->render)) {
+			return $this->config->render;
+		}
+		return 'html';
+	}
+
 	public function getTplFile()
 	{
-		return $this->appDir . '/tpl/pages/' . $this->locale . '/' . $this->page->name . '.html';
+		$render = $this->getRender();
+		return $this->devDir . '/tpl/pages/' . $this->locale . '/' 
+			. $this->page->name . '.' . $render;
+		return $this->appDir . '/tpl/pages/' . $this->locale . '/' 
+			. $this->page->name . '.' . $render;
 	}
 
 	public function getPage($name, $locale)
@@ -172,8 +185,33 @@ class Application
 		return $this->readJson('data/pages/' . $locale . '/' . $name . '.json');
 	}
 
-	public function processHtml($html)
+	public function getApplicationData()
 	{
+		$result = get_object_vars($this);
+		$result['app']       = $this;
+		$result['pugStyles']  = $this->getStyles();
+		$result['pugScripts'] = $this->getScripts();
+		$result['pugDirs']    = (object) [
+			'pub' => $this->pubDir,
+			'dev' => $this->devDir
+		];
+		$result['$insert'] = [$this, 'pugTagInsert'];
+		return $result;
+	}
+
+	private function processHtml()
+	{
+		$currentDir = getcwd();
+		chdir($this->appDir);
+
+		extract($this->getApplicationData());
+		ob_start();
+		include($this->getTplFile());
+		$html = ob_get_contents();
+		ob_end_clean();
+
+		chdir($currentDir);
+
 		if (LIVE_MODE) {
 			// remove <!--removeOnCompile-->
 			$search = '/<!--removeOnCompile-->.*?<!--\/removeOnCompile/s';
@@ -199,6 +237,37 @@ class Application
 		return $html;
 	}
 
+	private function processPug()
+	{
+		$pug = new \Pug\Pug(['prettyprint' => DEV_MODE]);
+		$this->render = $pug;
+		$pug->addKeyword('insert', [$this, 'pugTagInsert']);
+
+		return $pug->render($this->getTplFile(), $this->getApplicationData());
+	}
+
+	public function pugTagInsert($args, $block, $tag)
+	{
+		$file = trim($args, '()');
+		$dir = $this->devDir . '/tpl/';
+		if ('/' == substr($file, 0, 1)) {
+			$dir = $this->devDir;
+		}
+		$file = $dir . $file;
+		if ('.css' == substr($file, -4)) {
+			return file_get_contents($file);
+		}
+		return $this->render->render($file, $this->getApplicationData());
+	}
+
+	public function render()
+	{
+		if ('pug' == $this->getRender()) {
+			return $this->processPug();
+		}
+		return $this->processHtml();
+	}
+
 	public function getStyles($liveMode = null)
 	{
 		if (null === $liveMode) {
@@ -211,6 +280,7 @@ class Application
 		foreach ($json->styles as $id => $item) {
 			$style = (object) [
 				'src'        => '',
+				'path'       => '',
 				'inline'     => 'inline' === $id,
 				'attributes' => false,
 				'module'     => false
@@ -234,6 +304,9 @@ class Application
 			if ('~' == substr($style->src, 0, 1)) {
 				$style->module = ltrim($style->src, '~');
 				$style->src = $this->getModuleCssFile($style->src);
+			}
+			if ($style->src && $style->inline) {
+				$style->path = '../..' . $style->src;
 			}
 
 			$result[] = $style;
@@ -358,13 +431,23 @@ class Application
 				define('LIVE_MODE', false);
 			}
 		}
+		if (is_array($config)) {
+			$config = (object) $config;
+		}
+		if (isset($config->sys)) {
+			foreach ($config->sys as $k => $v) {
+				$config->$k = $v;
+			}
+			unset($config->sys);
+		}
 		$this->config = $config;
 	}
 
 	protected function load()
 	{
 		if (!$this->page) {
-			throw new \Exception("Page not found");
+			print("<h1>Page not found</h1><p>Add a page first</p>");
+			exit;
 		}
 
 		$this->pages = $this->getPages();

@@ -48,14 +48,9 @@ class CliController
 				$dir = dirname($buildFile);
 				static::mkdir(dirname($buildFile));
 
-				ob_start();
 				$app->run($url, $locale);
-				extract(get_object_vars($app));
-				include($app->getTplFile());
-				$data = ob_get_contents();
-				ob_end_clean();
 
-				file_put_contents($buildFile, $data);
+				file_put_contents($buildFile, $app->render());
 			}
 		}
 	}

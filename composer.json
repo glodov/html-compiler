@@ -1,6 +1,7 @@
 {
     "require": {
-        "emanueleminotto/simple-html-dom": "^1.5"
+        "emanueleminotto/simple-html-dom": "^1.5",
+        "pug-php/pug": "^2.6"
     },
     "autoload": {
         "psr-4": {

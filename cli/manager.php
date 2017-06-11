@@ -279,7 +279,19 @@ class CliController
 
 	public function addLangAction()
 	{
+		// copy .html to every [page] from default locale
+		// copy .json to every [page] from default page
+		// save into locales/db.json
+		print("Adding a language\n");
 
+		do {
+			$code = readline('Enter locale (prefix): ');
+			$code = trim($code);
+		} while (!in_array(strlen($code), [0, 2, 5]));
+		if (!$code) {
+			print("Language code is not provided\n");
+			exit;
+		}
 	}
 
 	public function delLangAction()

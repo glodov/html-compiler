@@ -1,0 +1,20 @@
+head
+  title= page.title
+  meta(charset='utf-8')
+
+  meta(name='viewport', content='width=device-width, initial-scale=1')
+
+  each item in pugStyles
+    if item.inline
+      style
+        insert(/assets/css/inline.css)
+
+    else if item.attributes
+      link(item.attributes)
+
+    else 
+      link(href= item.src, rel='stylesheet')
+
+  if config.ide.phpstorm
+    link(href='node_modules/bootstrap/dist/css/bootstrap.css', rel='stylesheet')
+  

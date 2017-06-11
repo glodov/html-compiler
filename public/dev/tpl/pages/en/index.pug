@@ -1,0 +1,15 @@
+doctype html
+html(lang= locale)
+
+  insert(block/__open.pug)
+
+  body
+
+    insert(block/header.pug)
+
+    div.container
+      h1= page.title
+
+    insert(block/footer.pug)
+  
+  insert(block/__close.pug)
