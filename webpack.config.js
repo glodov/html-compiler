@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const __dirSource = path.resolve(__dirname, './src');
+const __dirSource = path.resolve(__dirname, './public/dev/src');
 const __dirJs     = path.resolve(__dirSource, './js');
 const __dirSass   = path.resolve(__dirSource, './sass');
 const __dirAssets = path.resolve(__dirname, './public/dev/assets');
