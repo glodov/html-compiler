@@ -10,6 +10,12 @@ html(lang= locale)
     div.container
       h1= page.title
 
+    ul
+    	each item in products
+    		li
+    			p.lead= item.name
+    			p= item.price
+
     insert(block/footer.pug)
   
   insert(block/__close.pug)

@@ -45,7 +45,6 @@ class Application
 		$this->devDir  = $this->appDir . '/public/dev';
 		$this->pubDir  = $this->appDir . '/public/' . (LIVE_MODE ? 'live': 'dev');
 		$this->dataDir = $this->appDir . '/data';
-
 	}
 
 	public function run($uri = '/', $locale = null)
@@ -144,6 +143,9 @@ class Application
 	public function readJson($file, $asArray = false)
 	{
 		$file = $this->appDir . DIRECTORY_SEPARATOR . $file;
+		if (!file_exists($file)) {
+			return false;
+		}
 		return json_decode(file_get_contents($file), $asArray);
 	}
 
@@ -161,6 +163,54 @@ class Application
 	public function getPagesConfig()
 	{
 		return $this->readJson('data/pages/config.json');
+	}
+
+	public function getStructures()
+	{
+		$dir = $this->dataDir . '/structs';
+
+		$result = $this->readJson('data/structs/global.json');
+		if (!$result) {
+			$result = (object) [];
+		}
+
+		foreach (scandir($dir) as $name) {
+			if (in_array($name, ['.', '..'])) {
+				continue;
+			}
+			$file = $dir . '/' . $name;
+			if (!is_dir($file)) {
+				continue;
+			}
+			$files = [
+				'data/structs/' . $name . '/global.json',
+				'data/structs/' . $name . '/global.' . $this->locale . '.json'
+			];
+			foreach ($files as $file) {
+				$data = $this->readJson($file);
+				if (false === $data) {
+					continue;
+				}
+				if (!isset($result->$name)) {
+					$result->$name = [];
+				}
+				$result->$name = json_decode(json_encode($result->$name), true);
+
+				foreach ($data as $key => $value) {
+					$orig = isset($result->$name[$key]) 
+						? json_decode(json_encode($result->$name[$key]), true)
+						: [];
+					$value = json_decode(json_encode($value), true);
+					$value = array_replace_recursive($orig, $value);
+					$result->$name[$key] = json_decode(json_encode($value));
+				}
+				if (!is_array($data)) {
+					$result->$name = (object) $result->$name;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	public function getRender()
@@ -467,10 +517,14 @@ class Application
 			$this->locale . '/' . $this->page->name . '.json'
 		];
 
+		foreach ($this->getStructures() as $key => $value) {
+			$this->$key = $value;
+		}
+
 		$config = [];
 
 		foreach ($files as $file) {
-			$file = __DIR__ . '/../data/' . $file;
+			$file = $this->dataDir . '/' . $file;
 			if (file_exists($file)) {
 				$json = json_decode(file_get_contents($file), true);
 				if (is_array($json)) {
